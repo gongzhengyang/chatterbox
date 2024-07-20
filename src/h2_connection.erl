@@ -1269,9 +1269,10 @@ receive_data(Socket, Streams, Connection, Flow, Type, First, Decoder) ->
                                             case {h2_stream_set:recv_window_size(Stream), IWS div 2} of
                                                 {SRem, SHalf} when SRem < SHalf ->
                                                     %% refill
-                                                    h2_frame_window_update:send(Socket, IWS - SRem, Header#frame_header.stream_id);
+                                                    h2_frame_window_update:send(Socket, IWS - SRem, Header#frame_header.stream_id),
+                                                    h2_stream_set:increment_recv_window(IWS - SRem, Stream);
                                                 _ ->
-                                                    % h2_stream_set:decrement_recv_window(L, Stream),
+                                                    h2_stream_set:decrement_recv_window(L, Stream),
                                                     ok
                                             end;
 
