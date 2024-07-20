@@ -1265,16 +1265,13 @@ receive_data(Socket, Streams, Connection, Flow, Type, First, Decoder) ->
 
                                             %send_window_update(Connection, L),
                                             recv_data(Stream, Frame),
-                                            SSM = h2_stream_set:recv_window_size(Stream),
-                                            SIWS = IWS div 2,
-                                            io:write("---~p  ~p ~n", [SSM, SIWS]),
                                             %% Make window size great again if we've used up half our buffer for stream level window
                                             case {h2_stream_set:recv_window_size(Stream), IWS div 2} of
                                                 {SRem, SHalf} when SRem < SHalf ->
                                                     %% refill
                                                     h2_frame_window_update:send(Socket, IWS - SRem, Header#frame_header.stream_id);
                                                 _ ->
-                                                    h2_stream_set:decrement_recv_window(L, Stream),
+                                                    % h2_stream_set:decrement_recv_window(L, Stream),
                                                     ok
                                             end;
 
