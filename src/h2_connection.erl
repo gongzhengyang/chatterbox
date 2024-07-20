@@ -1263,9 +1263,7 @@ receive_data(Socket, Streams, Connection, Flow, Type, First, Decoder) ->
                                                     ok
                                             end,
 
-                                            %send_window_update(Connection, L),
-                                            recv_data(Stream, Frame),
-                                            %% Make window size great again if we've used up half our buffer for stream level window
+                                             %% Make window size great again if we've used up half our buffer for stream level window
                                             case {h2_stream_set:recv_window_size(Stream), IWS div 2} of
                                                 {SRem, SHalf} when SRem < SHalf ->
                                                     %% refill
@@ -1274,7 +1272,10 @@ receive_data(Socket, Streams, Connection, Flow, Type, First, Decoder) ->
                                                 _ ->
                                                     h2_stream_set:decrement_recv_window(L, Stream),
                                                     ok
-                                            end;
+                                            end,
+
+                                            %send_window_update(Connection, L),
+                                            recv_data(Stream, Frame);
 
                                         %% Either
                                         %% {false, auto, false} or
