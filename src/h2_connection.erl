@@ -1268,9 +1268,17 @@ receive_data(Socket, Streams, Connection, Flow, Type, First, Decoder) ->
                                                 {SRem, SHalf} when SRem < SHalf ->
                                                     %% refill
                                                     h2_frame_window_update:send(Socket, IWS - SRem, Header#frame_header.stream_id),
-                                                    h2_stream_set:increment_recv_window(IWS - SRem, Stream);
+                                                    {ok, ok} = h2_stream_set:update(Header#frame_header.stream_id,
+                                                                                    fun(Str) ->
+                                                                                            {h2_stream_set:increment_recv_window(IWS - SRem, Str), ok}
+                                                                                    end,
+                                                                                    Streams);
                                                 _ ->
-                                                    h2_stream_set:decrement_recv_window(L, Stream),
+                                                    {ok, ok} = h2_stream_set:update(Header#frame_header.stream_id,
+                                                                                    fun(Str) ->
+                                                                                            {h2_stream_set:decrement_recv_window(L, Str), ok}
+                                                                                    end,
+                                                                                    Streams),
                                                     ok
                                             end,
 
